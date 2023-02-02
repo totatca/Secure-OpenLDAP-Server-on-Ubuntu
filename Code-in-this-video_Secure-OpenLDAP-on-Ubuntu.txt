@@ -1,0 +1,33 @@
+***
+*** Replace server-1.hg.local = Your-FQDN
+***
+
+	openssl genrsa -aes128 -out server-1.hg.local.key 4096
+
+	openssl rsa -in server-1.hg.local.key -out server-1.hg.local.key
+
+	openssl req -new -days 3650 -key server-1.hg.local.key -out server-1.hg.local.csr 
+
+	sudo openssl x509 -in server-1.hg.local.csr -out server-1.hg.local.crt -req -signkey server-1.hg.local.key -days 3650
+
+
+dn: cn=config
+changetype: modify
+add: olcTLSCACertificateFile
+olcTLSCACertificateFile: /etc/ldap/sasl2/ca-certificates.crt
+-
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/ldap/sasl2/server-1.hg.local.crt
+-
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/ldap/sasl2/server-1.hg.local.key
+
+
+	sudo ldapmodify -Y EXTERNAL -H ldapi:/// -f SSL-LDAP.ldif
+	
+TLS_CACERT	/etc/ldap/sasl2/ca-certificates.crt
+TLS_REQCERT	allow
+
+
+
+
